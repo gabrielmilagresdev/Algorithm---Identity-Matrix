@@ -1,8 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 int** algoritmoMatrizI(int** matriz, int tamanho){
+    if(matriz == NULL || tamanho <= 0){
+        printf("Matriz invalida ou tamanho invalido.\n");
+        return NULL;
+    }
     int** matrizAuxiliar;
     int contador=0;
+    int valorOposto;
     matrizAuxiliar = (int**)malloc(tamanho * sizeof(int*));
     for(int i = 0; i < tamanho; i++){
         matrizAuxiliar[i] = (int*)malloc(tamanho * sizeof(int));
@@ -11,31 +16,27 @@ int** algoritmoMatrizI(int** matriz, int tamanho){
         for(int j = 0; j < tamanho; j++)
             matrizAuxiliar[i][j] = 0;
         }
-    if(matriz == NULL || tamanho <= 0){
-        printf("Matriz invalida ou tamanho invalido.\n");
-        return NULL;
-    }
     for(int w = 0; w<tamanho ;w++){
-        for(int i = 0; i < tamanho ; i++){
-            if(matriz[w][w] == 0){
-                for(int j = 1; j<tamanho;j++){
-                    if(matriz[j][w] != 0){
-                        matrizAuxiliar[0][0] = matriz[j][w];
-                        matriz[j][w] = matriz[w][w];
-                        matriz[w][w] = matrizAuxiliar[0][0];
-                        matrizAuxiliar[0][0] = 0;
-                    }else{
-                        contador++;
-                    }
-                }
-                if(contador == (tamanho-1)){
-                    printf("A MATRIZ NAO E INVERSIVEL!\n");
-                    return matrizAuxiliar;
+        if(matriz[w][w] == 0){
+            for(int j = 1; j<tamanho;j++){
+                if(matriz[j][w] != 0){
+                    matrizAuxiliar[0][0] = matriz[j][w];
+                    matriz[j][w] = matriz[w][w];
+                    matriz[w][w] = matrizAuxiliar[0][0];
+                    matrizAuxiliar[0][0] = 0;
+                }else{
+                    contador++;
                 }
             }
+            if(contador == (tamanho-1)){
+                printf("A MATRIZ NAO E INVERSIVEL!\n");
+                return NULL;
+            }
+        }else{
             for(int j = w+1 ; j<tamanho ; j++){
+                valorOposto =  (float)-matriz[j][w]/matriz[w][w] * matriz[w][w];
                 if(matriz[j][w] != 0)
-                    matriz[j][w] = (matriz[w][w] * (-matriz[j][w] / matriz[w][w])) + matriz[j][w];
+                    matriz[j][w] = valorOposto + matriz[j][w];
             }
         }
     }
@@ -56,7 +57,15 @@ int main(){
             scanf("%d", &matriz[i][j]);
         }
     }
+    printf("Matriz escolhida:\n");
+    for(int i = 0; i < tamanho; i++){
+        for(int j = 0; j < tamanho; j++){
+            printf("%d ", matriz[i][j]);
+        }
+        printf("\n");
+    }
     matriz = algoritmoMatrizI(matriz, tamanho);
+    printf("Matriz resultante:\n");
     for(int i = 0; i < tamanho; i++){
         for(int j = 0; j < tamanho; j++){
             printf("%d ", matriz[i][j]);
