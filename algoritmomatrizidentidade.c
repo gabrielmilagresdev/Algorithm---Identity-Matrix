@@ -18,12 +18,15 @@ int** algoritmoMatrizI(int** matriz, int tamanho){
         }
     for(int w = 0; w<tamanho ;w++){
         if(matriz[w][w] == 0){
-            for(int j = 1; j<tamanho;j++){
+            for(int j = w+1 ; j<tamanho;j++){
                 if(matriz[j][w] != 0){
-                    matrizAuxiliar[0][0] = matriz[j][w];
-                    matriz[j][w] = matriz[w][w];
-                    matriz[w][w] = matrizAuxiliar[0][0];
-                    matrizAuxiliar[0][0] = 0;
+                    for(int z = w ; z<tamanho ; z++){
+                        matrizAuxiliar[0][z] = matriz[j][z];
+                        matriz[j][z] = matriz[w][z];
+                        matriz[w][z] = matrizAuxiliar[0][z];
+                        matrizAuxiliar[0][z] = 0;
+                    }
+                    break;
                 }else{
                     contador++;
                 }
@@ -32,13 +35,12 @@ int** algoritmoMatrizI(int** matriz, int tamanho){
                 printf("A MATRIZ NAO E INVERSIVEL!\n");
                 return NULL;
             }
-        }else{
+        }
             for(int j = w+1 ; j<tamanho ; j++){
                 valorOposto =  (float)-matriz[j][w]/matriz[w][w] * matriz[w][w];
                 if(matriz[j][w] != 0)
                     matriz[j][w] = valorOposto + matriz[j][w];
             }
-        }
     }
     return matriz;
 }
