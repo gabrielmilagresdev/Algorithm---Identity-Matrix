@@ -1,21 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
-int** algoritmoMatrizI(int** matriz, int tamanho){
+
+double** algoritmoMatrizI(double** matriz, int tamanho){
     if(matriz == NULL || tamanho <= 0){
         printf("Matriz invalida ou tamanho invalido.\n");
         return NULL;
     }
-    int** matrizAuxiliar;
+    double** matrizAuxiliar;
     int contador=0;
-    int valorOposto;
-    matrizAuxiliar = (int**)malloc(tamanho * sizeof(int*));
+    double valorOposto;
+
+    matrizAuxiliar = (double**)malloc(tamanho * sizeof(double*));
     for(int i = 0; i < tamanho; i++){
-        matrizAuxiliar[i] = (int*)malloc(tamanho * sizeof(int));
+        matrizAuxiliar[i] = (double*)malloc(tamanho * sizeof(double));
     }
+
     for(int i = 0; i < tamanho; i++){
         for(int j = 0; j < tamanho; j++)
-            matrizAuxiliar[i][j] = 0;
-        }
+            matrizAuxiliar[i][j] = 0.0;
+    }
+
     for(int w = 0; w<tamanho ;w++){
         if(matriz[w][w] == 0){
             for(int j = w+1 ; j<tamanho;j++){
@@ -24,7 +28,7 @@ int** algoritmoMatrizI(int** matriz, int tamanho){
                         matrizAuxiliar[0][z] = matriz[j][z];
                         matriz[j][z] = matriz[w][z];
                         matriz[w][z] = matrizAuxiliar[0][z];
-                        matrizAuxiliar[0][z] = 0;
+                        matrizAuxiliar[0][z] = 0.0;
                     }
                     break;
                 }else{
@@ -36,41 +40,52 @@ int** algoritmoMatrizI(int** matriz, int tamanho){
                 return NULL;
             }
         }
-            for(int j = w+1 ; j<tamanho ; j++){
-                valorOposto =  (float)-matriz[j][w]/matriz[w][w] * matriz[w][w];
-                if(matriz[j][w] != 0)
-                    matriz[j][w] = valorOposto + matriz[j][w];
+    }
+
+    for (int z = 0; z<tamanho-1; z++){
+        for (int j = z+1; j<tamanho; j++){
+            valorOposto = -matriz[j][z]/matriz[z][z];
+            for (int l = 0; l<tamanho; l++){
+                matriz[j][l] = matriz[z][l]*valorOposto + matriz[j][l];
             }
+        }
     }
     return matriz;
 }
+
 int main(){
-    int **matriz;
+    double **matriz;
     int tamanho;
+
     printf("Digite o numero de linhas e colunas da matriz quadrada: ");
     scanf("%d", &tamanho);
-    matriz = (int**)malloc(tamanho * sizeof(int*));
+
+    matriz = (double**)malloc(tamanho * sizeof(double*));
     for(int i = 0; i < tamanho; i++){
-        matriz[i] = (int*)malloc(tamanho * sizeof(int));
+        matriz[i] = (double*)malloc(tamanho * sizeof(double));
     }
+
     for(int i = 0; i < tamanho; i++){
         for(int j = 0; j < tamanho; j++){
             printf("Elemento [%d][%d]: ", i, j);
-            scanf("%d", &matriz[i][j]);
+            scanf("%lf", &matriz[i][j]);
         }
     }
+
     printf("Matriz escolhida:\n");
     for(int i = 0; i < tamanho; i++){
         for(int j = 0; j < tamanho; j++){
-            printf("%d ", matriz[i][j]);
+            printf("%.2lf ", matriz[i][j]);
         }
         printf("\n");
     }
+
     matriz = algoritmoMatrizI(matriz, tamanho);
+
     printf("Matriz resultante:\n");
     for(int i = 0; i < tamanho; i++){
         for(int j = 0; j < tamanho; j++){
-            printf("%d ", matriz[i][j]);
+            printf("%.2lf ", matriz[i][j]);
         }
         printf("\n");
     }
