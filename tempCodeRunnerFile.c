@@ -26,7 +26,7 @@ void imprimirMatriz(double** matrizImprimir, int tamanho){
 double** trocarLinhas(double** matrizTrocar, int tamanho){
     verificarMatriz(matrizTrocar,tamanho);
     double** matrizAuxiliar;
-    int contador=0;
+    int trocou = 1;
 
     matrizAuxiliar = (double**)malloc(tamanho * sizeof(double*));
     for(int i = 0; i < tamanho; i++){
@@ -40,35 +40,58 @@ double** trocarLinhas(double** matrizTrocar, int tamanho){
 
     for(int w = 0; w<tamanho ;w++){
         if(matrizTrocar[w][w] == 0){
+            trocou = 0;
             for(int j = w+1 ; j<tamanho;j++){
                 if(matrizTrocar[j][w] != 0){
-                    for(int z = w ; z<tamanho ; z++){
+                    for(int z = 0 ; z<tamanho ; z++){
                         matrizAuxiliar[0][z] = matrizTrocar[j][z];
                         matrizTrocar[j][z] = matrizTrocar[w][z];
                         matrizTrocar[w][z] = matrizAuxiliar[0][z];
                         matrizAuxiliar[0][z] = 0.0;
                     }
+                    trocou = 1;
                     break;
-                }else{
-                    contador++;
                 }
-            }
-            if(contador == (tamanho-1)){
-                printf("A MATRIZ NAO E INVERSIVEL!\n");
-                return NULL;
             }
         }
     }
+    if(trocou==1){
+        liberarMatriz(matrizAuxiliar,tamanho);
+        return matrizTrocar;
+    }
+    if(trocou == 0){
+        for(int w = tamanho-1; w>=0 ;w--){
+            if(matrizTrocar[w][w] == 0){
+                for(int j = w-1 ; j>=0;j--){
+                    if(matrizTrocar[j][w] != 0){
+                        for(int z = tamanho-1 ; z>=0 ; z--){
+                            matrizAuxiliar[0][z] = matrizTrocar[j][z];
+                            matrizTrocar[j][z] = matrizTrocar[w][z];
+                            matrizTrocar[w][z] = matrizAuxiliar[0][z];
+                            matrizAuxiliar[0][z] = 0.0;
+                        }
+                        trocou = 1;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+        
+    if(trocou==1){
+        liberarMatriz(matrizAuxiliar,tamanho);
+        return matrizTrocar;
+    }
     liberarMatriz(matrizAuxiliar,tamanho);
-    return matrizTrocar;
+    printf("A MATRIZ NAO E INVERSIVEL!\n");
+    return NULL;
+            
 }
-
-double** operacoesLinhas(double** matrizOperacoes, int tamanho){
+double** operacoesLinhasInferior(double** matrizOperacoes, int tamanho){
     verificarMatriz(matrizOperacoes,tamanho);
     double valorOposto;
     for (int z = 0; z<tamanho-1; z++){
         for (int j = z+1; j<tamanho; j++){
-            matrizOperacoes = trocarLinhas(matrizOperacoes,tamanho);
             valorOposto = -matrizOperacoes[j][z]/matrizOperacoes[z][z];
             for (int l = 0; l<tamanho; l++){
                 matrizOperacoes[j][l] = matrizOperacoes[z][l]*valorOposto + matrizOperacoes[j][l];
@@ -77,15 +100,32 @@ double** operacoesLinhas(double** matrizOperacoes, int tamanho){
     }
     return matrizOperacoes;
 }
-
+double** operacoesLinhasSuperior(double** matrizOperacoes, int tamanho){
+    verificarMatriz(matrizOperacoes,tamanho);
+    double valorOposto;
+    for (int z = tamanho-1; z>=0; z--){
+        for (int j = z-1; j>=0; j--){
+            valorOposto = -matrizOperacoes[j][z]/matrizOperacoes[z][z];
+            for (int l = 0; l<tamanho; l++){
+                matrizOperacoes[j][l] = matrizOperacoes[z][l]*valorOposto + matrizOperacoes[j][l];
+            }
+        }
+    }
+    return matrizOperacoes;
+}
+double** algoritmoMatrizISuperior(double** matriz, int tamanho){
+    verificarMatriz(matriz,tamanho);
+    matriz = trocarLinhas(matriz,tamanho);
+    matriz = operacoesLinhasSuperior(matriz,tamanho);
+    return matriz;
+}
 double** algoritmoMatrizIInferior(double** matriz, int tamanho){
     verificarMatriz(matriz,tamanho);
     matriz = trocarLinhas(matriz,tamanho);
-    matriz = operacoesLinhas(matriz,tamanho);
+    matriz = operacoesLinhasInferior(matriz,tamanho);
 
     return matriz;
 }
-
 int main(){
     double **matriz;
     int tamanho;
@@ -106,6 +146,9 @@ int main(){
     printf("Matriz Escolhida:\n");
     imprimirMatriz(matriz, tamanho);
     matriz = algoritmoMatrizIInferior(matriz, tamanho);
+    printf("Matriz Inferior:\n");
+    imprimirMatriz(matriz,tamanho);
+    matriz = algoritmoMatrizISuperior(matriz, tamanho);
     printf("Matriz Resultante:\n");
     imprimirMatriz(matriz, tamanho);
     liberarMatriz(matriz,tamanho);
