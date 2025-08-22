@@ -1,6 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+double** verificarTroca(double** matrizVT, int linha){
+    int contadorZeros = 0;
+    for(int i = 0; i<linha; i++){
+        if(matrizVT[linha][i] == 0){
+            contadorZeros++;
+        }
+    }
+    if(contadorZeros == linha)
+        return NULL;
+    else
+        return matrizVT;
+}
 void verificarMatriz(double** matrizVerificar, int tamanho){
     if(matrizVerificar == NULL || tamanho <= 0){
         printf("Matriz invalida ou tamanho invalido.\n");
@@ -42,17 +54,19 @@ double** trocarLinhas(double** matrizTrocar, int tamanho){
         if(matrizTrocar[w][w] == 0){
             for(int j = w+1 ; j<tamanho;j++){
                 if(matrizTrocar[j][w] != 0){
-                    for(int z = w ; z<tamanho ; z++){
-                        matrizAuxiliar[0][z] = matrizTrocar[j][z];
-                        matrizTrocar[j][z] = matrizTrocar[w][z];
-                        matrizTrocar[w][z] = matrizAuxiliar[0][z];
-                        matrizAuxiliar[0][z] = 0.0;
+                    if(verificarTroca(matrizTrocar, j)!=NULL){
+                        for(int z = w ; z<tamanho ; z++){
+                            matrizAuxiliar[0][z] = matrizTrocar[j][z];
+                            matrizTrocar[j][z] = matrizTrocar[w][z];
+                            matrizTrocar[w][z] = matrizAuxiliar[0][z];
+                            matrizAuxiliar[0][z] = 0.0;
+                        }
+                        break;
+                    }else{
+                        contador++;
                     }
-                    break;
-                }else{
-                    contador++;
                 }
-            }
+         }
             if(contador == (tamanho-1)){
                 printf("A MATRIZ NAO E INVERSIVEL!\n");
                 return NULL;
