@@ -13,11 +13,10 @@ double** verificarTroca(double** matrizVT, int linha){
     else
         return matrizVT;
 }
-double** verificarMatriz(double** matrizVerificar, int tamanho){
+void verificarMatriz(double** matrizVerificar, int tamanho){
     if(matrizVerificar == NULL || tamanho <= 0){
         printf("Matriz invalida ou tamanho invalido.\n");
     }
-    return NULL;
 }
 void liberarMatriz(double** matrizLiberar, int tamanho){
     verificarMatriz(matrizLiberar,tamanho);
@@ -71,6 +70,9 @@ double** trocarLinhas(double** matrizTrocar, int tamanho) {
     free(vetorAuxiliar);
     return matrizTrocar;
 }
+
+
+
 double** operacoesLinhas(double** matrizOperacoes, int tamanho){
     verificarMatriz(matrizOperacoes,tamanho);
     double valorOposto;
@@ -90,17 +92,11 @@ double** operacoesLinhas(double** matrizOperacoes, int tamanho){
     }
     return matrizOperacoes;
 }
-double** algoritmoMatrizIInferior(double** matriz, int tamanho) {
-    if (verificarMatriz(matriz, tamanho) == NULL)
-        return NULL;
 
-    matriz = trocarLinhas(matriz, tamanho);
-    if (matriz == NULL)
-        return NULL;
-
-    matriz = operacoesLinhas(matriz, tamanho);
-    if (matriz == NULL)
-        return NULL;
+double** algoritmoMatrizIInferior(double** matriz, int tamanho){
+    verificarMatriz(matriz,tamanho);
+    matriz = trocarLinhas(matriz,tamanho);
+    matriz = operacoesLinhas(matriz,tamanho);
 
     return matriz;
 }
@@ -126,10 +122,8 @@ int main(){
     imprimirMatriz(matriz, tamanho);
     matriz = algoritmoMatrizIInferior(matriz, tamanho);
     if(matriz == NULL)
-        printf("MATRIZ NAO INVERSIVEL");
-    else{
-        printf("Matriz Resultante:\n");
-        imprimirMatriz(matriz, tamanho);
-        liberarMatriz(matriz,tamanho);
-    }
+        printf("Matriz nao inversivel");
+    printf("Matriz Resultante:\n");
+    imprimirMatriz(matriz, tamanho);
+    liberarMatriz(matriz,tamanho);
 }
