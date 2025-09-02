@@ -23,9 +23,10 @@ void encerrarPrograma(double** encerrarMatriz, int tamanhoMatriz){
     fflush(stdout);
     exit(-1);
 }
+
 //Função para liberar a alocação dinâmica de uma matriz
 void liberarMatriz(double** matrizLiberar, int tamanhoMatriz){
-    for(int i = 0; i < tamanhoMatriz ; i++){
+    for(int i = 0; i < tamanhoMatriz; i++){
         free(matrizLiberar[i]); //Liberando colunas
     }
     free(matrizLiberar); //Liberando linhas
@@ -62,7 +63,9 @@ void verificarMatrizAumentada(double** matrizVerificar, int tamanhoMatriz){
 //Função para imprimir uma matriz
 void imprimirMatriz(double** matrizImprimir, int tamanhoMatriz){
     for(int i = 0; i < tamanhoMatriz; i++){
-        for(int j = 0 ; j < (tamanhoMatriz * 2) ; j++){            
+        for(int j = 0 ; j < (tamanhoMatriz * 2) ; j++){   
+            if(j == tamanhoMatriz)    
+                printf(" | ");
             printf("%.2lf ",matrizImprimir[i][j]); //Imprimindo cada elemento da matriz
         }
         printf("\n");
@@ -149,13 +152,13 @@ void verificarZeros(double** matrizVerificarZeros, int tamanhoMatriz){
 //Função para trocar as linhas caso algum pivô seja 0. Procedimento para o triângulo inferior
 double** trocaDeLinhasTI(double** matrizTrocaLinhas, int tamanhoMatriz){
     double* linhaAuxiliar;
-    linhaAuxiliar = malloc(tamanhoMatriz * sizeof(double));
+    linhaAuxiliar = malloc(2 * tamanhoMatriz * sizeof(double));
     for(int i = 0; i < tamanhoMatriz; i++){
         if(matrizTrocaLinhas[i][i] != 0) //Se o pivô for zero, será necessário trocar a linha para uma que não seja
             continue;    
         for(int j = tamanhoMatriz-1 ; j >= 0; j--){
             if(matrizTrocaLinhas[j][i] != 0){
-                for (int w = 0; w < tamanhoMatriz; w++){
+                for (int w = 0; w < 2 * tamanhoMatriz; w++){
                     linhaAuxiliar[w] = matrizTrocaLinhas[i][w]; //Realizando a troca a partir de um vetor auxiliar para armazenar os valores
                     matrizTrocaLinhas[i][w] = matrizTrocaLinhas[j][w];
                     matrizTrocaLinhas[j][w] = linhaAuxiliar[w];
@@ -181,7 +184,7 @@ double** normalizarPivos(double** matrizNormalizar, int tamanhoMatriz){
             valorNormalizar = 1.0 / matrizNormalizar[i][i]; //Valor para multiplicar a linha e deixar o pivô com valor 1
         else
             continue;    
-        for(int j = 0 ; j < tamanhoMatriz; j++){
+        for(int j = 0 ; j < 2 * tamanhoMatriz; j++){
             matrizNormalizar[i][j] = matrizNormalizar[i][j] * valorNormalizar; //Normalizando o pivô
         }
     } 
@@ -199,7 +202,7 @@ double** operacoesLinhasTI(double** matrizOperacoesTI, int tamanhoMatriz){
                 encerrarPrograma(matrizOperacoesTI, tamanhoMatriz);
             }
             valorOposto = -matrizOperacoesTI[j][i]/matrizOperacoesTI[i][i]; //Pegando o valor que, quando multiplicado pelo abaixo do pivô, dará zero
-            for(int w = 0; w < tamanhoMatriz; w++){
+            for(int w = 0; w < 2 * tamanhoMatriz; w++){
                 matrizOperacoesTI[j][w] = (matrizOperacoesTI[i][w] * valorOposto) + matrizOperacoesTI[j][w]; //Zerando o valor abaixo do pivô
             }
         }
@@ -221,7 +224,7 @@ double** operacoesLinhasTS(double** matrizOperacoesTS, int tamanhoMatriz){
                 encerrarPrograma(matrizOperacoesTS, tamanhoMatriz);
             }
              valorOposto = -matrizOperacoesTS[j][i]/matrizOperacoesTS[i][i]; //Pegando o valor que, quando multiplicado pelo acima do pivô, dará zero
-             for(int w = 0; w < tamanhoMatriz; w++){
+             for(int w = 0; w < 2 * tamanhoMatriz; w++){
                 matrizOperacoesTS[j][w] = (matrizOperacoesTS[i][w] * valorOposto) + matrizOperacoesTS[j][w]; //Zerando o valor acima do pivô
              }
         }
