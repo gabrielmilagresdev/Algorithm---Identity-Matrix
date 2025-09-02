@@ -14,6 +14,8 @@ double** trocaDeLinhasTI(double**, int);
 double** operacoesLinhasTI(double**, int);
 double** operacoesLinhasTS(double**, int);
 void encerrarPrograma(double**, int);
+void verificarMatrizAumentada(double**, int);
+double** alocarMatrizInversa(int);
 
 //Função para encerrar o programa
 void encerrarPrograma(double** encerrarMatriz, int tamanhoMatriz){
@@ -39,6 +41,20 @@ void verificarMatriz(double** matrizVerificar, int tamanhoMatriz){
         if(matrizVerificar[i] == NULL){
             printf("ERRO AO ALOCAR COLUNAS\n"); //Erro caso não aloque as colunas
             encerrarPrograma(matrizVerificar, tamanhoMatriz);
+        }
+    }
+}
+
+//Função para verificar se a matriz aumentada foi alocada com sucesso
+void verificarMatrizAumentada(double** matrizVerificar, int tamanhoMatriz){
+    if(matrizVerificar == NULL){
+        printf("ERRO AO ALOCAR LINHAS\n"); //Erro caso não aloque as linhas
+        encerrarPrograma(matrizVerificar, tamanhoMatriz);
+    }
+    for(int i = 0; i < 2 * tamanhoMatriz ; i++){
+        if(matrizVerificar[i] == NULL){
+            printf("ERRO AO ALOCAR COLUNAS\n"); //Erro caso não aloque as colunas
+            encerrarPrograma(matrizVerificar, 2 * tamanhoMatriz);
         }
     }
 }
@@ -69,6 +85,7 @@ double** alocarMatrizInversa(int tamanhoMatriz){
                 matrizInversa[i][j] = 0;
         }
     }
+    return matrizInversa;
 }
 
 //Função para inserir a matriz que vai inverter
@@ -77,8 +94,9 @@ double** inserirMatriz(int tamanhoMatriz){
     matrizInversa = alocarMatrizInversa(tamanhoMatriz);
     matrizInserir = (double **)malloc(tamanhoMatriz * sizeof(double *)); //Alocando as linhas
     for(int i = 0; i < tamanhoMatriz ; i++)
-        matrizInserir[i] = (double *)malloc(tamanhoMatriz * sizeof(double)); //Alocando as colunas
-    verificarMatriz(matrizInserir, tamanhoMatriz);
+        matrizInserir[i] = (double *)malloc(2 * tamanhoMatriz * sizeof(double)); //Alocando as colunas
+    verificarMatrizAumentada(matrizInserir, tamanhoMatriz);
+
     for(int i = 0; i < tamanhoMatriz; i++){
         for(int j = 0 ; j < tamanhoMatriz; j++){
             printf("Digite o Elemento [%d][%d]: ",i,j);
