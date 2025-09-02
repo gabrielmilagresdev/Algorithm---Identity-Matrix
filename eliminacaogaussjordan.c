@@ -62,7 +62,7 @@ void verificarMatrizAumentada(double** matrizVerificar, int tamanhoMatriz){
 //Função para imprimir uma matriz
 void imprimirMatriz(double** matrizImprimir, int tamanhoMatriz){
     for(int i = 0; i < tamanhoMatriz; i++){
-        for(int j = 0 ; j < tamanhoMatriz; j++){
+        for(int j = 0 ; j < (tamanhoMatriz * 2) ; j++){            
             printf("%.2lf ",matrizImprimir[i][j]); //Imprimindo cada elemento da matriz
         }
         printf("\n");
@@ -101,6 +101,11 @@ double** inserirMatriz(int tamanhoMatriz){
         for(int j = 0 ; j < tamanhoMatriz; j++){
             printf("Digite o Elemento [%d][%d]: ",i,j);
             scanf("%lf",&matrizInserir[i][j]); //Inserindo os elementos dentro da matriz
+        }
+    } 
+    for(int i = 0; i < tamanhoMatriz; i++){
+        for(int j = tamanhoMatriz ; j < tamanhoMatriz * 2; j++){
+            matrizInserir[i][j] = matrizInversa[i][j-tamanhoMatriz];
         }
     } 
     return matrizInserir;
