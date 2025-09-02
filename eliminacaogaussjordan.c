@@ -2,28 +2,27 @@
 #include <stdlib.h>
 
 //Assinando as funções do algoritmo
-void inserirTamanho();
-void liberarMatriz(double**);
-void verificarMatriz(double**);
-void imprimirMatriz(double**);
-double** inserirMatriz();
-double** eliminacaoGaussJordan(double**);
-double** normalizarPivos(double**);
-void verificarZeros(double**);
-double** trocaDeLinhasTI(double**);
-double** operacoesLinhasTI(double**);
-double** operacoesLinhasTS(double**);
+int inserirTamanho();
+void liberarMatriz(double**, int);
+void verificarMatriz(double**, int);
+void imprimirMatriz(double**, int);
+double** inserirMatriz(int);
+double** eliminacaoGaussJordan(double**, int);
+double** normalizarPivos(double**, int);
+void verificarZeros(double**, int);
+double** trocaDeLinhasTI(double**, int);
+double** operacoesLinhasTI(double**, int);
+double** operacoesLinhasTS(double**, int);
+void encerrarPrograma(double**, int);
 
-//Declarando o tamanho da matriz como global
-int tamanhoMatriz;
-
-void encerrarPrograma(double** encerrarMatriz){
-    liberarMatriz(encerrarMatriz);
+//Função para encerrar o programa
+void encerrarPrograma(double** encerrarMatriz, int tamanhoMatriz){
+    liberarMatriz(encerrarMatriz, tamanhoMatriz);
     fflush(stdout);
     exit(-1);
 }
 //Função para liberar a alocação dinâmica de uma matriz
-void liberarMatriz(double** matrizLiberar){
+void liberarMatriz(double** matrizLiberar, int tamanhoMatriz){
     for(int i = 0; i < tamanhoMatriz ; i++){
         free(matrizLiberar[i]); //Liberando colunas
     }
@@ -31,21 +30,21 @@ void liberarMatriz(double** matrizLiberar){
 }
 
 //Função para verificar se a matriz foi alocada com sucesso
-void verificarMatriz(double** matrizVerificar){
+void verificarMatriz(double** matrizVerificar, int tamanhoMatriz){
     if(matrizVerificar == NULL){
         printf("ERRO AO ALOCAR LINHAS\n"); //Erro caso não aloque as linhas
-        encerrarPrograma(matrizVerificar);
+        encerrarPrograma(matrizVerificar, tamanhoMatriz);
     }
     for(int i = 0; i < tamanhoMatriz ; i++){
         if(matrizVerificar[i] == NULL){
             printf("ERRO AO ALOCAR COLUNAS\n"); //Erro caso não aloque as colunas
-            encerrarPrograma(matrizVerificar);
+            encerrarPrograma(matrizVerificar, tamanhoMatriz);
         }
     }
 }
 
 //Função para imprimir uma matriz
-void imprimirMatriz(double** matrizImprimir){
+void imprimirMatriz(double** matrizImprimir, int tamanhoMatriz){
     for(int i = 0; i < tamanhoMatriz; i++){
         for(int j = 0 ; j < tamanhoMatriz; j++){
             printf("%.2lf ",matrizImprimir[i][j]); //Imprimindo cada elemento da matriz
@@ -56,12 +55,12 @@ void imprimirMatriz(double** matrizImprimir){
 }
 
 //Função para inserir a matriz que vai inverter
-double** inserirMatriz(){
+double** inserirMatriz(int tamanhoMatriz){
     double **matrizInserir;
     matrizInserir = (double **)malloc(tamanhoMatriz * sizeof(double *)); //Alocando as linhas
     for(int i = 0; i < tamanhoMatriz ; i++)
         matrizInserir[i] = (double *)malloc(tamanhoMatriz * sizeof(double)); //Alocando as colunas
-    verificarMatriz(matrizInserir);
+    verificarMatriz(matrizInserir, tamanhoMatriz);
     for(int i = 0; i < tamanhoMatriz; i++){
         for(int j = 0 ; j < tamanhoMatriz; j++){
             printf("Digite o Elemento [%d][%d]: ",i,j);
@@ -72,13 +71,15 @@ double** inserirMatriz(){
 }
 
 //Função para inserir o valor do número de linhas e colunas da matriz quadrada
-void inserirTamanho(){
+int inserirTamanho(){
+    int tamanhoMatriz;
     printf("Digite o Tamanho da Matriz Quadrada (Linhas/Colunas): "); //Inserindo número de linhas e colunas
     scanf("%d",&tamanhoMatriz);
+    return tamanhoMatriz;
 }
 
 //Função para verificar se existem linhas ou colunas só de zeros
-void verificarZeros(double** matrizVerificarZeros){
+void verificarZeros(double** matrizVerificarZeros, int tamanhoMatriz){
     int contadorZeros = 0;
     for(int i = 0; i < tamanhoMatriz; i++){
         contadorZeros = 0;
@@ -88,7 +89,7 @@ void verificarZeros(double** matrizVerificarZeros){
         }
         if(contadorZeros == tamanhoMatriz){
             printf("MATRIZ IRREVERSIVEL : LINHA DE ZEROS\n");
-            encerrarPrograma(matrizVerificarZeros);
+            encerrarPrograma(matrizVerificarZeros, tamanhoMatriz);
         }
     } 
     for(int i = 0; i < tamanhoMatriz; i++){
@@ -99,13 +100,13 @@ void verificarZeros(double** matrizVerificarZeros){
         }
         if(contadorZeros == tamanhoMatriz){
             printf("MATRIZ IRREVERSIVEL : COLUNA DE ZEROS\n");
-            encerrarPrograma(matrizVerificarZeros);
+            encerrarPrograma(matrizVerificarZeros, tamanhoMatriz);
         }
     } 
 }
 
 //Função para trocar as linhas caso algum pivô seja 0. Procedimento para o triângulo inferior
-double** trocaDeLinhasTI(double** matrizTrocaLinhas){
+double** trocaDeLinhasTI(double** matrizTrocaLinhas, int tamanhoMatriz){
     double* linhaAuxiliar;
     linhaAuxiliar = malloc(tamanhoMatriz * sizeof(double));
     for(int i = 0; i < tamanhoMatriz; i++){
@@ -124,7 +125,7 @@ double** trocaDeLinhasTI(double** matrizTrocaLinhas){
     for(int i = 0; i < tamanhoMatriz; i++){
         if(matrizTrocaLinhas[i][i] == 0){
             printf("MATRIZ NAO REVERSIVEL : ALGUM PIVO SEMPRE E NULO");
-            encerrarPrograma(matrizTrocaLinhas);
+            encerrarPrograma(matrizTrocaLinhas, tamanhoMatriz);
         }
     }
     free(linhaAuxiliar);
@@ -132,7 +133,7 @@ double** trocaDeLinhasTI(double** matrizTrocaLinhas){
 }
 
 //Função para normalizar os pivôs da matriz
-double** normalizarPivos(double** matrizNormalizar){
+double** normalizarPivos(double** matrizNormalizar, int tamanhoMatriz){
     double valorNormalizar; //Valor que será usado para normalizar as linhas necessárias
     for(int i = 0; i < tamanhoMatriz; i++){
         if(matrizNormalizar[i][i] != 1 && matrizNormalizar[i][i] != 0) //Caso o pivô não seja 1, realizar a operação de troca
@@ -147,14 +148,14 @@ double** normalizarPivos(double** matrizNormalizar){
 }
 
 //Função para zerar o triângulo inferior da matriz
-double** operacoesLinhasTI(double** matrizOperacoesTI){
+double** operacoesLinhasTI(double** matrizOperacoesTI, int tamanhoMatriz){
     double valorOposto; //Valor utilizado para zerar os valores abaixo do pivô
     for(int i = 0; i < tamanhoMatriz; i++){
         for(int j = i + 1; j < tamanhoMatriz; j++){
             if(matrizOperacoesTI[j][i] == 0)
                 continue;
             if(matrizOperacoesTI[i][i] == 0){
-                encerrarPrograma(matrizOperacoesTI);
+                encerrarPrograma(matrizOperacoesTI, tamanhoMatriz);
             }
             valorOposto = -matrizOperacoesTI[j][i]/matrizOperacoesTI[i][i]; //Pegando o valor que, quando multiplicado pelo abaixo do pivô, dará zero
             for(int w = 0; w < tamanhoMatriz; w++){
@@ -163,20 +164,20 @@ double** operacoesLinhasTI(double** matrizOperacoesTI){
         }
     }
     //Verificando se a matiz continua reversível
-    matrizOperacoesTI = normalizarPivos(matrizOperacoesTI);
-    verificarZeros(matrizOperacoesTI);
+    matrizOperacoesTI = normalizarPivos(matrizOperacoesTI, tamanhoMatriz);
+    verificarZeros(matrizOperacoesTI, tamanhoMatriz);
 
     return matrizOperacoesTI;
 }
 //Função para zerar o triângulo superior da matriz
-double** operacoesLinhasTS(double** matrizOperacoesTS){
+double** operacoesLinhasTS(double** matrizOperacoesTS, int tamanhoMatriz){
     double valorOposto; //Valor utilizado para zerar os valores acima do pivô
     for(int i = tamanhoMatriz - 1; i >= 0; i--){
         for(int j = i - 1; j >= 0; j--){
             if(matrizOperacoesTS[j][i] == 0)
                 continue;
             if(matrizOperacoesTS[i][i] == 0){
-                encerrarPrograma(matrizOperacoesTS);
+                encerrarPrograma(matrizOperacoesTS, tamanhoMatriz);
             }
              valorOposto = -matrizOperacoesTS[j][i]/matrizOperacoesTS[i][i]; //Pegando o valor que, quando multiplicado pelo acima do pivô, dará zero
              for(int w = 0; w < tamanhoMatriz; w++){
@@ -186,29 +187,29 @@ double** operacoesLinhasTS(double** matrizOperacoesTS){
     }
 
     //Verificando se a matiz continua reversível
-    matrizOperacoesTS = normalizarPivos(matrizOperacoesTS);
-    verificarZeros(matrizOperacoesTS);
+    matrizOperacoesTS = normalizarPivos(matrizOperacoesTS, tamanhoMatriz);
+    verificarZeros(matrizOperacoesTS, tamanhoMatriz);
 
     return matrizOperacoesTS;
 }
 
 //Função geral da Eliminação de Gauss-Jordan
-double** eliminacaoGaussJordan(double** matrizGauss){
-    verificarZeros(matrizGauss); //Chamando a função para verificar se há alguma coluna ou linha de zeros
-    matrizGauss = trocaDeLinhasTI(matrizGauss); //Chamando a função para não deixar os pivôs zerados
-    matrizGauss = normalizarPivos(matrizGauss); //Chamando a função para normalizar os pivos da matriz
-    matrizGauss = operacoesLinhasTI(matrizGauss); //Chamando a função para fazer a eliminação do triangulo inferior da matriz
-    matrizGauss = operacoesLinhasTS(matrizGauss); //Chamando a função para fazer a eliminação do triangulo superior da matriz
+double** eliminacaoGaussJordan(double** matrizGauss, int tamanhoMatriz){
+    verificarZeros(matrizGauss, tamanhoMatriz); //Chamando a função para verificar se há alguma coluna ou linha de zeros
+    matrizGauss = trocaDeLinhasTI(matrizGauss, tamanhoMatriz); //Chamando a função para não deixar os pivôs zerados
+    matrizGauss = normalizarPivos(matrizGauss, tamanhoMatriz); //Chamando a função para normalizar os pivos da matriz
+    matrizGauss = operacoesLinhasTI(matrizGauss, tamanhoMatriz); //Chamando a função para fazer a eliminação do triangulo inferior da matriz
+    matrizGauss = operacoesLinhasTS(matrizGauss, tamanhoMatriz); //Chamando a função para fazer a eliminação do triangulo superior da matriz
     return matrizGauss;
 }
 int main(){
-    //Declarando a matriz principal
     double** matrizMain;
+    int tamanhoMain;
 
-    inserirTamanho(); //Chamando a função para inserir o tamanho da matriz
-    matrizMain = inserirMatriz(); //Chamando a função para inserir a matriz
-    imprimirMatriz(matrizMain); 
-    matrizMain = eliminacaoGaussJordan(matrizMain); //Inicializando o algoritmo da Eliminação de Gauss-Jordan
-    imprimirMatriz(matrizMain); 
-    liberarMatriz(matrizMain);
+    tamanhoMain = inserirTamanho(); //Chamando a função para inserir o tamanho da matriz
+    matrizMain = inserirMatriz(tamanhoMain); //Chamando a função para inserir a matriz
+    imprimirMatriz(matrizMain, tamanhoMain); 
+    matrizMain = eliminacaoGaussJordan(matrizMain, tamanhoMain); //Inicializando o algoritmo da Eliminação de Gauss-Jordan
+    imprimirMatriz(matrizMain, tamanhoMain); 
+    liberarMatriz(matrizMain, tamanhoMain);
 }
