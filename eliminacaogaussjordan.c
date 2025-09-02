@@ -54,9 +54,27 @@ void imprimirMatriz(double** matrizImprimir, int tamanhoMatriz){
     printf("\n");
 }
 
+//Função para gerar uma matriz inversa
+double** alocarMatrizInversa(int tamanhoMatriz){
+    double** matrizInversa;
+    matrizInversa = (double **)malloc(tamanhoMatriz * sizeof(double *)); //Alocando as linhas
+    for(int i = 0; i < tamanhoMatriz ; i++)
+        matrizInversa[i] = (double *)malloc(tamanhoMatriz * sizeof(double)); //Alocando as colunas
+    verificarMatriz(matrizInversa, tamanhoMatriz);
+    for(int i = 0; i < tamanhoMatriz; i++){
+        for(int j = 0; j < tamanhoMatriz; j++){
+            if(i == j)
+                matrizInversa[i][j] = 1;
+            else
+                matrizInversa[i][j] = 0;
+        }
+    }
+}
+
 //Função para inserir a matriz que vai inverter
 double** inserirMatriz(int tamanhoMatriz){
-    double **matrizInserir;
+    double **matrizInserir, **matrizInversa;
+    matrizInversa = alocarMatrizInversa(tamanhoMatriz);
     matrizInserir = (double **)malloc(tamanhoMatriz * sizeof(double *)); //Alocando as linhas
     for(int i = 0; i < tamanhoMatriz ; i++)
         matrizInserir[i] = (double *)malloc(tamanhoMatriz * sizeof(double)); //Alocando as colunas
