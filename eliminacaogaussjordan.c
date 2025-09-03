@@ -75,8 +75,11 @@ void imprimirMatriz(double** matrizImprimir, int tamanhoMatriz){
     for(int i = 0; i < tamanhoMatriz; i++){
         for(int j = 0 ; j < (tamanhoMatriz * 2) ; j++){   
             if(j == tamanhoMatriz)    
-                printf(" | ");
-            printf("%.2lf ",matrizImprimir[i][j]); //Imprimindo cada elemento da matriz
+                printf(" | "); //Para dividir as duas matrizes na matriz aumentada [A|I]
+            if(dbabs(matrizImprimir[i][j]) < EPSILON)
+                 printf("%.2lf ", 0); //Imprimindo cada elemento próximo a zero como zero
+            else
+                printf("%.2lf ", matrizImprimir[i][j]); //Imprimindo cada elemento da matriz
         }
         printf("\n");
     } 
