@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#define EPSILON 1e-9 //Declaração de uma constante pequena para valores pequenos (mais precisão do que o número zero)
 
 //Assinando as funções do algoritmo
 int inserirTamanho();
@@ -10,18 +11,27 @@ double** inserirMatriz(int);
 double** eliminacaoGaussJordan(double**, int);
 double** normalizarPivos(double**, int);
 void verificarZeros(double**, int);
-double** trocaDeLinhasTI(double**, int);
+double** trocaDeLinhas(double**, int);
 double** operacoesLinhasTI(double**, int);
 double** operacoesLinhasTS(double**, int);
 void encerrarPrograma(double**, int);
 void verificarMatrizAumentada(double**, int);
 double** alocarMatrizInversa(int);
+double dbabs(double);
+
 
 //Função para encerrar o programa
 void encerrarPrograma(double** encerrarMatriz, int tamanhoMatriz){
     liberarMatriz(encerrarMatriz, tamanhoMatriz);
     fflush(stdout);
     exit(-1);
+}
+
+//Função para pegar o valor absoluto de um número
+double dbabs(double valor){
+    if(valor < 0)
+        valor = valor*(-1);
+    return valor;
 }
 
 //Função para liberar a alocação dinâmica de uma matriz
@@ -52,7 +62,7 @@ void verificarMatrizAumentada(double** matrizVerificar, int tamanhoMatriz){
         printf("ERRO AO ALOCAR LINHAS\n"); //Erro caso não aloque as linhas
         encerrarPrograma(matrizVerificar, tamanhoMatriz);
     }
-    for(int i = 0; i < 2 * tamanhoMatriz ; i++){
+    for(int i = 0; i < tamanhoMatriz ; i++){
         if(matrizVerificar[i] == NULL){
             printf("ERRO AO ALOCAR COLUNAS\n"); //Erro caso não aloque as colunas
             encerrarPrograma(matrizVerificar, 2 * tamanhoMatriz);
@@ -111,6 +121,7 @@ double** inserirMatriz(int tamanhoMatriz){
             matrizInserir[i][j] = matrizInversa[i][j-tamanhoMatriz];
         }
     } 
+    liberarMatriz(matrizInversa, tamanhoMatriz);
     return matrizInserir;
 }
 
@@ -128,7 +139,7 @@ void verificarZeros(double** matrizVerificarZeros, int tamanhoMatriz){
     for(int i = 0; i < tamanhoMatriz; i++){
         contadorZeros = 0;
         for(int j = tamanhoMatriz-1 ; j >= 0; j--){
-            if(matrizVerificarZeros[i][j] == 0) //Caso tenha uma linha só de zeros, a matriz não é reversível
+            if(dbabs(matrizVerificarZeros[i][j]) < EPSILON) //Caso tenha uma linha só de zeros, a matriz não é reversível
             contadorZeros++;
         }
         if(contadorZeros == tamanhoMatriz){
@@ -139,7 +150,7 @@ void verificarZeros(double** matrizVerificarZeros, int tamanhoMatriz){
     for(int i = 0; i < tamanhoMatriz; i++){
         contadorZeros = 0;
         for(int j = tamanhoMatriz-1 ; j >= 0; j--){
-            if(matrizVerificarZeros[j][i] == 0) //Caso tenha uma coluna só de zeros, a matriz não é reversível
+            if(dbabs(matrizVerificarZeros[j][i]) < EPSILON) //Caso tenha uma coluna só de zeros, a matriz não é reversível
             contadorZeros++;
         }
         if(contadorZeros == tamanhoMatriz){
@@ -149,32 +160,36 @@ void verificarZeros(double** matrizVerificarZeros, int tamanhoMatriz){
     } 
 }
 
-//Função para trocar as linhas caso algum pivô seja 0. Procedimento para o triângulo inferior
-double** trocaDeLinhasTI(double** matrizTrocaLinhas, int tamanhoMatriz){
-    double* linhaAuxiliar;
-    linhaAuxiliar = malloc(2 * tamanhoMatriz * sizeof(double));
-    for(int i = 0; i < tamanhoMatriz; i++){
-        if(matrizTrocaLinhas[i][i] != 0) //Se o pivô for zero, será necessário trocar a linha para uma que não seja
-            continue;    
-        for(int j = tamanhoMatriz-1 ; j >= 0; j--){
-            if(matrizTrocaLinhas[j][i] != 0){
-                for (int w = 0; w < 2 * tamanhoMatriz; w++){
-                    linhaAuxiliar[w] = matrizTrocaLinhas[i][w]; //Realizando a troca a partir de um vetor auxiliar para armazenar os valores
-                    matrizTrocaLinhas[i][w] = matrizTrocaLinhas[j][w];
-                    matrizTrocaLinhas[j][w] = linhaAuxiliar[w];
-                }
+double** trocaDeLinhas(double** matrizTrocaLinhas, int tamanhoMatriz) {
+    double* linhaAuxiliar = malloc((2 * tamanhoMatriz) * sizeof(double)); //Declaração de um vetor que irá armazenar uma linha durante a permutação
+    for (int i = 0; i < tamanhoMatriz; i++) {
+        //Procurando o maior pivô (em valor absoluto) da coluna i, da linha i em diante
+        int indiceMaiorValorPossivel = i;
+        double maiorPivoPossivel = dbabs(matrizTrocaLinhas[i][i]);
+        for (int j = i + 1; j < tamanhoMatriz; j++) {
+            if (dbabs(matrizTrocaLinhas[j][i]) > maiorPivoPossivel) {
+                maiorPivoPossivel = dbabs(matrizTrocaLinhas[j][i]);
+                indiceMaiorValorPossivel = j;
             }
         }
-    } 
-    for(int i = 0; i < tamanhoMatriz; i++){
-        if(matrizTrocaLinhas[i][i] == 0){
-            printf("MATRIZ NAO REVERSIVEL : ALGUM PIVO SEMPRE E NULO");
+        //Caso seja necessário, faz a troca de linhas
+        if (indiceMaiorValorPossivel != i) {
+            for (int z = 0; z < 2 * tamanhoMatriz; z++) {
+                linhaAuxiliar[z] = matrizTrocaLinhas[i][z];
+                matrizTrocaLinhas[i][z] = matrizTrocaLinhas[indiceMaiorValorPossivel][z];
+                matrizTrocaLinhas[indiceMaiorValorPossivel][z] = linhaAuxiliar[z];
+            }
+        }
+        // Verifica se o pivô ficou zero (não dá pra inverter)
+        if (dbabs(matrizTrocaLinhas[i][i]) < EPSILON) {
+            printf("MATRIZ NAO REVERSIVEL : PIVO NULO NA LINHA %d\n", i);
             encerrarPrograma(matrizTrocaLinhas, tamanhoMatriz);
         }
     }
     free(linhaAuxiliar);
     return matrizTrocaLinhas;
 }
+
 
 //Função para normalizar os pivôs da matriz
 double** normalizarPivos(double** matrizNormalizar, int tamanhoMatriz){
@@ -196,11 +211,12 @@ double** operacoesLinhasTI(double** matrizOperacoesTI, int tamanhoMatriz){
     double valorOposto; //Valor utilizado para zerar os valores abaixo do pivô
     for(int i = 0; i < tamanhoMatriz; i++){
         for(int j = i + 1; j < tamanhoMatriz; j++){
-            if(matrizOperacoesTI[j][i] == 0)
-                continue;
-            if(matrizOperacoesTI[i][i] == 0){
-                encerrarPrograma(matrizOperacoesTI, tamanhoMatriz);
-            }
+            if(dbabs(matrizOperacoesTI[j][i]) < EPSILON)
+                continue; //Não precisa realizar operação caso o elemento seja zero
+            if(dbabs(matrizOperacoesTI[i][i]) < EPSILON)
+                matrizOperacoesTI = trocaDeLinhas(matrizOperacoesTI,tamanhoMatriz);
+            if(dbabs(matrizOperacoesTI[i][i]) < EPSILON)
+                encerrarPrograma(matrizOperacoesTI, tamanhoMatriz); //Para evitar divisão por zero
             valorOposto = -matrizOperacoesTI[j][i]/matrizOperacoesTI[i][i]; //Pegando o valor que, quando multiplicado pelo abaixo do pivô, dará zero
             for(int w = 0; w < 2 * tamanhoMatriz; w++){
                 matrizOperacoesTI[j][w] = (matrizOperacoesTI[i][w] * valorOposto) + matrizOperacoesTI[j][w]; //Zerando o valor abaixo do pivô
@@ -218,11 +234,12 @@ double** operacoesLinhasTS(double** matrizOperacoesTS, int tamanhoMatriz){
     double valorOposto; //Valor utilizado para zerar os valores acima do pivô
     for(int i = tamanhoMatriz - 1; i >= 0; i--){
         for(int j = i - 1; j >= 0; j--){
-            if(matrizOperacoesTS[j][i] == 0)
+            if(dbabs(matrizOperacoesTS[j][i]) < EPSILON)
                 continue;
-            if(matrizOperacoesTS[i][i] == 0){
+            if(dbabs(matrizOperacoesTS[i][i]) < EPSILON)
+                matrizOperacoesTS = trocaDeLinhas(matrizOperacoesTS,tamanhoMatriz);
+            if(dbabs(matrizOperacoesTS[i][i]) < EPSILON)
                 encerrarPrograma(matrizOperacoesTS, tamanhoMatriz);
-            }
              valorOposto = -matrizOperacoesTS[j][i]/matrizOperacoesTS[i][i]; //Pegando o valor que, quando multiplicado pelo acima do pivô, dará zero
              for(int w = 0; w < 2 * tamanhoMatriz; w++){
                 matrizOperacoesTS[j][w] = (matrizOperacoesTS[i][w] * valorOposto) + matrizOperacoesTS[j][w]; //Zerando o valor acima do pivô
@@ -240,10 +257,11 @@ double** operacoesLinhasTS(double** matrizOperacoesTS, int tamanhoMatriz){
 //Função geral da Eliminação de Gauss-Jordan
 double** eliminacaoGaussJordan(double** matrizGauss, int tamanhoMatriz){
     verificarZeros(matrizGauss, tamanhoMatriz); //Chamando a função para verificar se há alguma coluna ou linha de zeros
-    matrizGauss = trocaDeLinhasTI(matrizGauss, tamanhoMatriz); //Chamando a função para não deixar os pivôs zerados
+    matrizGauss = trocaDeLinhas(matrizGauss, tamanhoMatriz); //Chamando a função para não deixar os pivôs zerados
     matrizGauss = normalizarPivos(matrizGauss, tamanhoMatriz); //Chamando a função para normalizar os pivos da matriz
     matrizGauss = operacoesLinhasTI(matrizGauss, tamanhoMatriz); //Chamando a função para fazer a eliminação do triangulo inferior da matriz
     matrizGauss = operacoesLinhasTS(matrizGauss, tamanhoMatriz); //Chamando a função para fazer a eliminação do triangulo superior da matriz
+    
     return matrizGauss;
 }
 int main(){
@@ -257,3 +275,4 @@ int main(){
     imprimirMatriz(matrizMain, tamanhoMain); 
     liberarMatriz(matrizMain, tamanhoMain);
 }
+//*ALGORITMO SENSÍVEL A MATRIZES SINGULARES
